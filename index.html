@@ -135,6 +135,34 @@
             const id = currentEditId || Date.now().toString();
             await set(ref(database, 'products/' + id), product);
             closeModal();
+
+                // Event listener para o formulário de produtos
+    document.getElementById('productForm').addEventListener('submit', async function(e) {
+        e.preventDefault();
+        
+        const product = {
+            codigo: document.getElementById('codigo').value,
+            descricao: document.getElementById('descricao').value,
+            unidade: document.getElementById('unidade').value,
+            quantidade: parseFloat(document.getElementById('quantidade').value)
+        };
+        
+        if (currentEditId) {
+            // Editar produto existente
+            const index = produtos.findIndex(p => p.id === currentEditId);
+            if (index !== -1) {
+                produtos[index] = { ...produtos[index], ...product };
+            }
+        } else {
+            // Adicionar novo produto
+            product.id = Date.now().toString();
+            produtos.push(product);
+        }
+        
+        salvarDados();
+        closeModal();
+        exibirToast('✅ Produto salvo com sucesso!');
+    });
         });
         document.getElementById('searchInput').addEventListener('input', (e) => { renderTable(e.target.value); });
         function renderTable(searchTerm = '') {
