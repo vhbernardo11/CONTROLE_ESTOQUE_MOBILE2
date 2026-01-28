@@ -1621,10 +1621,8 @@
             toast.className = `toast show ${tipo === 'erro' ? 'erro' : tipo === 'aviso' ? 'aviso' : ''}`;
             setTimeout(() => toast.classList.remove('show'), 3500);
         }
-    </script>
-</body>
-    
-      // Exportar funções para o escopo global
+
+              // Exportar funções para o escopo global
       window.mudarSecao = mudarSecao;
       window.abrirModalDados = abrirModalDados;
       window.filtrar = filtrar;
@@ -1642,4 +1640,8 @@
       window.importarJSON = importarJSON;
       window.exportarJSON = exportarJSON;
       window.exportarCSV = exportarCSV;
+
+    </script>
+</body>
+    
 </html>
