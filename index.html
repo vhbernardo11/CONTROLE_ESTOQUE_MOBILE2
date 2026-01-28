@@ -1055,8 +1055,8 @@
             { codigo1: "NULL", codigo2: "123", nome: "ABRAÇADEIRA AÇO TIPO U COMUM 1/2\"", estoqueMin: 0, estoqueAtual: 0, preco: 0.35, setor: "CONSTRUÇÃO" }
         ];
 
-        document.addEventListener('DOMContentLoaded', function() {
-            carregarDados();
+        document.addEventListener('DOMContentLoaded', async function() {
+            await carregarDados();
             construirSetores();
             filtrar();
             atualizarStats();
@@ -1064,7 +1064,24 @@
             exibirToast('✅ Sistema carregado!');
         });
 
-        function carregarDados() {
+        async function carregarDados() {
+                // Tentar carregar do dadosreais.json primeiro
+    try {
+        const response = await fetch('dadosreais.json');
+        if (response.ok) {
+            const dadosJSON = await response.json();
+            produtos = dadosJSON;
+            produtos.forEach(p => {
+                const setorNormalizado = SETORES_UNICOS.find(s => s.toUpperCase() === (p.setor || '').toUpperCase());
+                if(setorNormalizado) p.setor = setorNormalizado;
+            });
+            filtrados = [...produtos];
+            localStorage.setItem('produtosAlmox', JSON.stringify(produtos));
+            return;
+        }
+    } catch(e) {
+        console.log('Falha ao carregar dadosreais.json, usando localStorage ou dados iniciais');
+    }
             const dados = localStorage.getItem('produtosAlmox');
             if (dados) {
                 try {
