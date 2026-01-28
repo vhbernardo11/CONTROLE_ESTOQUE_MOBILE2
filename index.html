@@ -7,6 +7,29 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
     <title>Almoxarifado Pro - Controle de Estoque</title>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
+        <!-- Firebase SDK -->
+    <script type="module">
+      import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
+      import { getDatabase, ref, set, get, onValue } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-database.js";
+
+      const firebaseConfig = {
+        apiKey: "AIzaSyAR4nzQjy4NlgO11mM6fmVzi4Aa1khPzh4",
+        authDomain: "almoxarifado-estoque-e1e6c.firebaseapp.com",
+        databaseURL: "https://almoxarifado-estoque-e1e6c-default-rtdb.firebaseio.com",
+        projectId: "almoxarifado-estoque-e1e6c",
+        storageBucket: "almoxarifado-estoque-e1e6c.firebasestorage.app",
+        messagingSenderId: "17545084455",
+        appId: "1:17545084455:web:63437b9b411839cef2d802"
+      };
+
+      const app = initializeApp(firebaseConfig);
+      const database = getDatabase(app);
+      window.firebaseDb = database;
+      window.firebaseRef = ref;
+      window.firebaseSet = set;
+      window.firebaseGet = get;
+      window.firebaseOnValue = onValue;
+    </script>
     <style>
         * {
             margin: 0;
@@ -1066,6 +1089,28 @@
 
         async function carregarDados() {
                 // Tentar carregar do dadosreais.json primeiro
+                // Tentar carregar do Firebase primeiro
+    if(window.firebaseDb && window.firebaseRef && window.firebaseGet) {
+        try {
+            const produtosRef = window.firebaseRef(window.firebaseDb, 'produtos');
+            const snapshot = await window.firebaseGet(produtosRef);
+            if (snapshot.exists()) {
+                const dadosFirebase = snapshot.val();
+                if(Array.isArray(dadosFirebase) && dadosFirebase.length > 0) {
+                    produtos = dadosFirebase;
+                    produtos.forEach(p => {
+                        const setorNormalizado = SETORES_UNICOS.find(s => s.toUpperCase() === (p.setor || '').toUpperCase());
+                        if(setorNormalizado) p.setor = setorNormalizado;
+                    });
+                    filtrados = [...produtos];
+                    localStorage.setItem('produtosAlmox', JSON.stringify(produtos));
+                    return;
+                }
+            }
+        } catch(e) {
+            console.log('Falha ao carregar do Firebase, tentando dadosreais.json');
+        }
+    }
     try {
         const response = await fetch('dadosreais.json');
         if (response.ok) {
@@ -1103,6 +1148,11 @@
 
         function salvarDados() {
             localStorage.setItem('produtosAlmox', JSON.stringify(produtos));
+                // Salvar no Firebase
+    if(window.firebaseDb && window.firebaseRef && window.firebaseSet) {
+        const produtosRef = window.firebaseRef(window.firebaseDb, 'produtos');
+        window.firebaseSet(produtosRef, produtos).catch(err => console.error('Erro ao salvar no Firebase:', err));
+    }
             carregarDados();
             filtrar();
             atualizarStats();
