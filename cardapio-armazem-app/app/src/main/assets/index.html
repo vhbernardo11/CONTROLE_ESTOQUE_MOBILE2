@@ -1,0 +1,803 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <meta name="theme-color" content="#120e0b">
+  <title>Armazém — Cardápio Digital</title>
+  <style>
+    :root {
+      --bg: #120e0b;
+      --panel: #1c1511;
+      --panel-2: #261b15;
+      --ink: #f4e4c5;
+      --muted: #c4ad8d;
+      --orange: #e57a24;
+      --orange-2: #ff9a42;
+      --red: #a52f20;
+      --green: #4ca36a;
+      --line: rgba(244, 228, 197, .12);
+      --shadow: 0 14px 35px rgba(0, 0, 0, .34);
+      --radius: 20px;
+    }
+
+    * { box-sizing: border-box; }
+    html { scroll-behavior: smooth; background: var(--bg); }
+    body {
+      margin: 0;
+      min-height: 100vh;
+      color: var(--ink);
+      background:
+        radial-gradient(circle at 15% 0%, rgba(229, 122, 36, .14), transparent 34%),
+        radial-gradient(circle at 95% 15%, rgba(165, 47, 32, .13), transparent 28%),
+        repeating-linear-gradient(135deg, transparent 0 22px, rgba(255,255,255,.012) 22px 23px),
+        var(--bg);
+      font-family: Inter, ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, Arial, sans-serif;
+      padding-bottom: calc(96px + env(safe-area-inset-bottom));
+      -webkit-tap-highlight-color: transparent;
+    }
+
+    button, input, textarea { font: inherit; }
+    button { cursor: pointer; }
+
+    .hero {
+      position: relative;
+      overflow: hidden;
+      padding: calc(24px + env(safe-area-inset-top)) 20px 24px;
+      background:
+        linear-gradient(135deg, rgba(12,8,6,.28), rgba(12,8,6,.86)),
+        linear-gradient(120deg, var(--red), #6d1e17 54%, #2b1712);
+      border-bottom: 1px solid rgba(255,255,255,.1);
+    }
+
+    .hero::before {
+      content: "";
+      position: absolute;
+      width: 210px;
+      height: 210px;
+      right: -80px;
+      top: -100px;
+      border: 26px solid rgba(255,255,255,.045);
+      border-radius: 50%;
+    }
+
+    .hero::after {
+      content: "";
+      position: absolute;
+      left: -30px;
+      right: -30px;
+      bottom: -27px;
+      height: 52px;
+      background: var(--orange);
+      transform: rotate(-2deg);
+      opacity: .95;
+    }
+
+    .topline {
+      position: relative;
+      z-index: 1;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+    }
+
+    .brandmark {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .logo {
+      width: 50px;
+      height: 50px;
+      border-radius: 15px;
+      display: grid;
+      place-items: center;
+      font-size: 27px;
+      font-weight: 950;
+      color: var(--ink);
+      background: var(--panel);
+      border: 2px solid var(--orange);
+      box-shadow: var(--shadow);
+    }
+
+    .brand-title {
+      margin: 0;
+      font-weight: 950;
+      letter-spacing: .08em;
+      font-size: 22px;
+      line-height: 1;
+    }
+
+    .brand-subtitle {
+      margin: 5px 0 0;
+      color: rgba(255,255,255,.78);
+      font-size: 12px;
+      font-weight: 700;
+      letter-spacing: .06em;
+      text-transform: uppercase;
+    }
+
+    .icon-btn {
+      width: 44px;
+      height: 44px;
+      border-radius: 14px;
+      border: 1px solid rgba(255,255,255,.16);
+      background: rgba(18,14,11,.45);
+      color: white;
+      display: grid;
+      place-items: center;
+      font-size: 20px;
+    }
+
+    .hero-copy {
+      position: relative;
+      z-index: 1;
+      margin-top: 28px;
+      max-width: 620px;
+    }
+
+    .eyebrow {
+      display: inline-flex;
+      align-items: center;
+      gap: 7px;
+      padding: 7px 10px;
+      border-radius: 999px;
+      background: rgba(18,14,11,.48);
+      border: 1px solid rgba(255,255,255,.14);
+      color: #ffdcbf;
+      font-size: 12px;
+      font-weight: 800;
+    }
+
+    .hero h2 {
+      margin: 14px 0 8px;
+      font-size: clamp(26px, 8vw, 42px);
+      line-height: 1.02;
+      letter-spacing: -.035em;
+    }
+
+    .hero p {
+      margin: 0;
+      color: rgba(255,255,255,.78);
+      line-height: 1.5;
+      font-size: 14px;
+    }
+
+    .search-wrap {
+      position: sticky;
+      z-index: 20;
+      top: 0;
+      padding: 14px 14px 10px;
+      background: linear-gradient(var(--bg) 70%, transparent);
+    }
+
+    .search {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      border: 1px solid var(--line);
+      border-radius: 17px;
+      padding: 0 14px;
+      background: rgba(31,23,18,.96);
+      box-shadow: 0 8px 28px rgba(0,0,0,.26);
+      backdrop-filter: blur(10px);
+    }
+
+    .search span { color: var(--orange-2); font-size: 19px; }
+    .search input {
+      width: 100%;
+      height: 52px;
+      border: 0;
+      outline: 0;
+      color: var(--ink);
+      background: transparent;
+      font-size: 15px;
+    }
+    .search input::placeholder { color: #9e8970; }
+
+    .categories {
+      display: flex;
+      overflow-x: auto;
+      gap: 8px;
+      padding: 2px 14px 14px;
+      scrollbar-width: none;
+    }
+    .categories::-webkit-scrollbar { display: none; }
+
+    .chip {
+      flex: 0 0 auto;
+      border: 1px solid var(--line);
+      border-radius: 999px;
+      padding: 10px 13px;
+      color: var(--muted);
+      background: var(--panel);
+      font-weight: 750;
+      font-size: 13px;
+    }
+    .chip.active {
+      color: #1a110c;
+      background: var(--orange);
+      border-color: var(--orange);
+    }
+
+    main { padding: 0 14px; }
+
+    .notice {
+      display: grid;
+      grid-template-columns: auto 1fr;
+      gap: 11px;
+      padding: 14px;
+      margin: 0 0 18px;
+      background: linear-gradient(120deg, rgba(229,122,36,.14), rgba(165,47,32,.11));
+      border: 1px solid rgba(229,122,36,.24);
+      border-radius: 17px;
+      color: var(--muted);
+      line-height: 1.4;
+      font-size: 13px;
+    }
+    .notice strong { color: var(--ink); display: block; margin-bottom: 2px; }
+
+    .section-head {
+      display: flex;
+      align-items: end;
+      justify-content: space-between;
+      gap: 10px;
+      margin: 22px 2px 11px;
+    }
+    .section-head h3 {
+      margin: 0;
+      font-size: 20px;
+      letter-spacing: -.02em;
+    }
+    .section-head span { color: var(--muted); font-size: 12px; }
+
+    .grid { display: grid; gap: 11px; }
+
+    .card {
+      position: relative;
+      display: grid;
+      grid-template-columns: 1fr auto;
+      gap: 13px;
+      padding: 15px;
+      border: 1px solid var(--line);
+      border-radius: var(--radius);
+      background:
+        linear-gradient(135deg, rgba(255,255,255,.025), transparent 55%),
+        var(--panel);
+      box-shadow: 0 8px 22px rgba(0,0,0,.15);
+    }
+    .card.unavailable { opacity: .56; }
+
+    .card-name {
+      margin: 0 0 5px;
+      font-size: 16px;
+      line-height: 1.2;
+      color: var(--ink);
+    }
+
+    .card-desc {
+      margin: 0;
+      color: var(--muted);
+      font-size: 12.5px;
+      line-height: 1.45;
+    }
+
+    .badges { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 9px; }
+    .badge {
+      display: inline-flex;
+      align-items: center;
+      padding: 5px 8px;
+      border-radius: 999px;
+      background: rgba(229,122,36,.12);
+      border: 1px solid rgba(229,122,36,.18);
+      color: #ffc08d;
+      font-size: 10.5px;
+      font-weight: 800;
+    }
+    .badge.green { color: #9ae0ae; background: rgba(76,163,106,.12); border-color: rgba(76,163,106,.2); }
+    .badge.gray { color: #c7b7a1; background: rgba(255,255,255,.05); border-color: rgba(255,255,255,.08); }
+
+    .card-side {
+      min-width: 82px;
+      display: flex;
+      flex-direction: column;
+      align-items: flex-end;
+      justify-content: space-between;
+      gap: 11px;
+    }
+    .price { color: #fff; font-weight: 950; font-size: 17px; white-space: nowrap; }
+
+    .add-btn {
+      min-width: 42px;
+      height: 38px;
+      border: 0;
+      border-radius: 12px;
+      background: var(--orange);
+      color: #21130b;
+      font-size: 22px;
+      font-weight: 900;
+      box-shadow: 0 7px 15px rgba(229,122,36,.2);
+    }
+    .add-btn:disabled { background: #56473d; color: #8d7d70; box-shadow: none; }
+
+    .empty {
+      text-align: center;
+      padding: 40px 20px;
+      color: var(--muted);
+      border: 1px dashed var(--line);
+      border-radius: 20px;
+    }
+
+    .bottom-bar {
+      position: fixed;
+      z-index: 50;
+      left: 12px;
+      right: 12px;
+      bottom: calc(10px + env(safe-area-inset-bottom));
+      display: grid;
+      grid-template-columns: 54px 1fr;
+      gap: 9px;
+    }
+
+    .bot-btn, .cart-btn {
+      height: 58px;
+      border: 0;
+      color: white;
+      box-shadow: 0 16px 35px rgba(0,0,0,.4);
+    }
+    .bot-btn {
+      border-radius: 18px;
+      background: var(--panel-2);
+      border: 1px solid var(--line);
+      font-size: 22px;
+    }
+    .cart-btn {
+      border-radius: 18px;
+      padding: 0 17px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      background: linear-gradient(110deg, var(--orange), #c94f20);
+      color: #1f1009;
+      font-weight: 900;
+    }
+    .cart-btn small { display: block; font-size: 11px; opacity: .72; font-weight: 750; }
+    .cart-btn .total { font-size: 16px; }
+
+    .overlay {
+      position: fixed;
+      z-index: 80;
+      inset: 0;
+      display: none;
+      align-items: flex-end;
+      background: rgba(0,0,0,.68);
+      backdrop-filter: blur(3px);
+    }
+    .overlay.open { display: flex; }
+
+    .sheet {
+      width: 100%;
+      max-height: 91vh;
+      overflow: auto;
+      padding: 10px 16px calc(22px + env(safe-area-inset-bottom));
+      background: var(--panel);
+      border-radius: 26px 26px 0 0;
+      border-top: 1px solid var(--line);
+      box-shadow: 0 -18px 50px rgba(0,0,0,.45);
+      animation: up .2s ease-out;
+    }
+    @keyframes up { from { transform: translateY(35px); opacity: .6; } }
+
+    .grab { width: 44px; height: 5px; border-radius: 99px; background: #5a4a3d; margin: 1px auto 14px; }
+    .sheet-head { display: flex; justify-content: space-between; align-items: center; gap: 10px; }
+    .sheet-head h3 { margin: 0; font-size: 20px; }
+    .close-btn { border: 0; background: #30231b; color: var(--ink); width: 38px; height: 38px; border-radius: 12px; font-size: 20px; }
+
+    .cart-list { display: grid; gap: 9px; margin: 16px 0; }
+    .cart-item {
+      display: grid;
+      grid-template-columns: 1fr auto;
+      gap: 10px;
+      padding: 12px;
+      background: #17110e;
+      border: 1px solid var(--line);
+      border-radius: 15px;
+    }
+    .cart-item strong { display: block; font-size: 14px; }
+    .cart-item small { color: var(--muted); }
+    .qty { display: flex; align-items: center; gap: 9px; }
+    .qty button { width: 31px; height: 31px; border-radius: 10px; border: 1px solid var(--line); background: #2a1d17; color: var(--ink); font-size: 18px; }
+
+    .field { margin-top: 11px; }
+    .field label { display: block; margin: 0 0 6px; color: var(--muted); font-size: 12px; font-weight: 750; }
+    .field input, .field textarea {
+      width: 100%;
+      color: var(--ink);
+      background: #17110e;
+      border: 1px solid var(--line);
+      border-radius: 14px;
+      padding: 13px;
+      outline: 0;
+    }
+    .field textarea { min-height: 80px; resize: vertical; }
+
+    .summary {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 15px 2px 8px;
+      border-top: 1px solid var(--line);
+      font-weight: 900;
+    }
+
+    .actions { display: grid; grid-template-columns: 1fr 1.45fr; gap: 9px; margin-top: 10px; }
+    .actions button {
+      min-height: 49px;
+      border-radius: 14px;
+      border: 1px solid var(--line);
+      font-weight: 900;
+    }
+    .secondary { background: #2a1d17; color: var(--ink); }
+    .primary { background: var(--orange); color: #21130b; border-color: var(--orange) !important; }
+
+    .chat-box { min-height: 320px; max-height: 58vh; overflow-y: auto; display: flex; flex-direction: column; gap: 9px; padding: 15px 1px; }
+    .bubble { max-width: 86%; padding: 11px 12px; border-radius: 15px; line-height: 1.4; font-size: 13px; white-space: pre-line; }
+    .bubble.bot { align-self: flex-start; background: #2a1d17; border: 1px solid var(--line); color: var(--ink); border-bottom-left-radius: 5px; }
+    .bubble.user { align-self: flex-end; background: var(--orange); color: #22130b; font-weight: 700; border-bottom-right-radius: 5px; }
+    .chat-form { display: grid; grid-template-columns: 1fr 48px; gap: 8px; }
+    .chat-form input { min-width: 0; height: 48px; border-radius: 14px; padding: 0 13px; border: 1px solid var(--line); color: var(--ink); background: #17110e; outline: 0; }
+    .chat-form button { border: 0; border-radius: 14px; background: var(--orange); color: #22130b; font-size: 19px; font-weight: 950; }
+    .quick { display: flex; gap: 7px; overflow-x: auto; padding-bottom: 10px; scrollbar-width: none; }
+    .quick button { white-space: nowrap; padding: 8px 10px; border-radius: 999px; border: 1px solid var(--line); background: #2a1d17; color: var(--muted); font-size: 11px; font-weight: 750; }
+
+    .legal { padding: 34px 4px 0; color: #8d7964; font-size: 11px; line-height: 1.55; text-align: center; }
+
+    @media (min-width: 680px) {
+      body { max-width: 760px; margin: 0 auto; box-shadow: 0 0 90px rgba(0,0,0,.55); }
+      .grid { grid-template-columns: 1fr 1fr; }
+      .overlay { justify-content: center; }
+      .sheet { max-width: 760px; }
+      .bottom-bar { max-width: 736px; margin: 0 auto; }
+    }
+  </style>
+</head>
+<body>
+  <header class="hero">
+    <div class="topline">
+      <div class="brandmark">
+        <div class="logo">A</div>
+        <div>
+          <h1 class="brand-title">ARMAZÉM</h1>
+          <p class="brand-subtitle">Espetos • Porções • Drinks</p>
+        </div>
+      </div>
+      <button class="icon-btn" aria-label="Informações" onclick="showInfo()">ⓘ</button>
+    </div>
+    <div class="hero-copy">
+      <span class="eyebrow">🔥 Feito para abrir rápido e funcionar offline</span>
+      <h2>Escolha com calma.<br>Peça sem complicação.</h2>
+      <p>Pesquise produtos, filtre categorias e monte seu pedido no celular. Confirme disponibilidade e valores com a equipe.</p>
+    </div>
+  </header>
+
+  <div class="search-wrap">
+    <label class="search">
+      <span>⌕</span>
+      <input id="searchInput" type="search" placeholder="Buscar espetos, porções, drinks..." autocomplete="off">
+    </label>
+  </div>
+
+  <nav id="categoryNav" class="categories" aria-label="Categorias"></nav>
+
+  <main>
+    <div class="notice">
+      <span>ℹ️</span>
+      <div><strong>Protótipo do cardápio digital</strong>Os dados foram transcritos do cardápio físico. Alguns detalhes, horários e disponibilidade ainda precisam ser confirmados pelo estabelecimento.</div>
+    </div>
+    <div id="menuRoot"></div>
+    <p class="legal">Bebidas alcoólicas são destinadas a maiores de 18 anos. Se beber, não dirija. Imagens ilustrativas não foram usadas para evitar divergências com os produtos reais.</p>
+  </main>
+
+  <div class="bottom-bar">
+    <button class="bot-btn" onclick="openChat()" aria-label="Abrir atendente digital">💬</button>
+    <button class="cart-btn" onclick="openCart()">
+      <span><small id="cartCount">Pedido vazio</small>Ver pedido</span>
+      <span id="cartTotal" class="total">R$ 0,00</span>
+    </button>
+  </div>
+
+  <div id="cartOverlay" class="overlay" onclick="overlayClose(event, 'cartOverlay')">
+    <section class="sheet" role="dialog" aria-modal="true" aria-label="Seu pedido">
+      <div class="grab"></div>
+      <div class="sheet-head">
+        <h3>Seu pedido</h3>
+        <button class="close-btn" onclick="closeOverlay('cartOverlay')">×</button>
+      </div>
+      <div id="cartList" class="cart-list"></div>
+      <div class="field">
+        <label for="tableNumber">Mesa ou identificação</label>
+        <input id="tableNumber" placeholder="Ex.: Mesa 08">
+      </div>
+      <div class="field">
+        <label for="orderNotes">Observações</label>
+        <textarea id="orderNotes" placeholder="Ex.: sem cebola, carne ao ponto, separar molhos..."></textarea>
+      </div>
+      <div class="summary"><span>Total estimado</span><span id="sheetTotal">R$ 0,00</span></div>
+      <div class="actions">
+        <button class="secondary" onclick="copyOrder()">Copiar</button>
+        <button class="primary" onclick="shareOrder()">Compartilhar pedido</button>
+      </div>
+    </section>
+  </div>
+
+  <div id="chatOverlay" class="overlay" onclick="overlayClose(event, 'chatOverlay')">
+    <section class="sheet" role="dialog" aria-modal="true" aria-label="Atendente digital">
+      <div class="grab"></div>
+      <div class="sheet-head">
+        <div><h3>Atendente digital</h3><small style="color:var(--muted)">Respostas automáticas do cardápio</small></div>
+        <button class="close-btn" onclick="closeOverlay('chatOverlay')">×</button>
+      </div>
+      <div class="quick">
+        <button onclick="askQuick('Quais são as porções?')">Porções</button>
+        <button onclick="askQuick('Tem bebida sem álcool?')">Sem álcool</button>
+        <button onclick="askQuick('Quais lanches estão disponíveis hoje?')">Lanches hoje</button>
+        <button onclick="askQuick('Qual é a promoção de shots?')">Promoção</button>
+      </div>
+      <div id="chatBox" class="chat-box"></div>
+      <form class="chat-form" onsubmit="sendChat(event)">
+        <input id="chatInput" placeholder="Pergunte sobre um item..." autocomplete="off">
+        <button type="submit">➜</button>
+      </form>
+    </section>
+  </div>
+
+  <div id="infoOverlay" class="overlay" onclick="overlayClose(event, 'infoOverlay')">
+    <section class="sheet" role="dialog" aria-modal="true" aria-label="Sobre o aplicativo">
+      <div class="grab"></div>
+      <div class="sheet-head">
+        <h3>Sobre este aplicativo</h3>
+        <button class="close-btn" onclick="closeOverlay('infoOverlay')">×</button>
+      </div>
+      <div style="color:var(--muted);line-height:1.6;font-size:14px;padding:14px 2px">
+        <p><strong style="color:var(--ink)">Versão demonstrativa offline.</strong> O aplicativo reúne o cardápio, busca, filtros, pedido e um atendente automático básico.</p>
+        <p>Para uso real por QR Code, o cardápio também deve ser publicado em um endereço na internet. Assim, o cliente abre pelo navegador sem precisar instalar aplicativo.</p>
+        <p>Antes da publicação, confirme preços, descrições, horários, tamanhos das porções e dados de contato.</p>
+      </div>
+      <button class="primary" style="width:100%;min-height:49px;border:0;border-radius:14px;font-weight:900" onclick="closeOverlay('infoOverlay')">Entendi</button>
+    </section>
+  </div>
+
+<script>
+const products = [
+  {id:1,cat:'Espetos',name:'Picanha Meia-Lua',price:25.90,desc:'Espeto de picanha em corte meia-lua.',tags:['Destaque']},
+  {id:2,cat:'Espetos',name:'Alcatra',price:12.50,desc:'Espeto de alcatra.'},
+  {id:3,cat:'Espetos',name:'Filé-mignon com queijo',price:16.90,desc:'Filé-mignon combinado com queijo.'},
+  {id:4,cat:'Espetos',name:'Calabresa',price:6.50,desc:'Espeto de calabresa.'},
+  {id:5,cat:'Espetos',name:'Linguiça toscana',price:6.90,desc:'Espeto de linguiça toscana.'},
+  {id:6,cat:'Espetos',name:'Carne bovina',price:10.50,desc:'Espeto de carne bovina.'},
+  {id:7,cat:'Espetos',name:'Tulipa',price:10.50,desc:'Tulipa de frango no espeto.'},
+  {id:8,cat:'Espetos',name:'Choripan',price:6.90,desc:'Espeto estilo choripan.'},
+  {id:9,cat:'Espetos',name:'Coração',price:10.50,desc:'Coração de frango no espeto.'},
+  {id:10,cat:'Espetos',name:'Kafta',price:10.50,desc:'Kafta temperada no espeto.'},
+  {id:11,cat:'Espetos',name:'Medalhão de frango',price:10.50,desc:'Medalhão de frango no espeto.'},
+  {id:12,cat:'Espetos',name:'Panceta',price:8.50,desc:'Panceta assada no espeto.'},
+  {id:13,cat:'Espetos',name:'Pão de alho',price:6.90,desc:'Pão de alho assado.'},
+  {id:14,cat:'Espetos',name:'Queijo coalho',price:6.90,desc:'Queijo coalho assado.'},
+  {id:15,cat:'Espetos',name:'Queijo com chocolate',price:7.50,desc:'Queijo assado com chocolate.',tags:['Doce']},
+  {id:16,cat:'Espetos',name:'Queijo com goiabada',price:7.50,desc:'Queijo assado com goiabada.',tags:['Doce']},
+  {id:17,cat:'Espetos',name:'Queijo com doce de leite',price:7.50,desc:'Queijo assado com doce de leite.',tags:['Doce']},
+  {id:18,cat:'Porções',name:'Anéis de cebola',price:29.90,desc:'Porção de anéis de cebola empanados.'},
+  {id:19,cat:'Porções',name:'Batata frita',price:29.90,desc:'Porção de batatas fritas.'},
+  {id:20,cat:'Porções',name:'Batata frita com cheddar e bacon',price:35.90,desc:'Batata frita coberta com cheddar e bacon.',tags:['Mais pedido']},
+  {id:21,cat:'Porções',name:'Batata rústica',price:34.90,desc:'Batatas em corte rústico.'},
+  {id:22,cat:'Porções',name:'Filé de tilápia',price:49.90,desc:'Porção de filé de tilápia.'},
+  {id:23,cat:'Porções',name:'Isca de frango',price:47.90,desc:'Porção de iscas de frango.'},
+  {id:24,cat:'Porções',name:'Polenta frita',price:25.90,desc:'Porção de polenta frita.'},
+  {id:25,cat:'Porções',name:'Queijo coalho empanado',price:49.90,desc:'Porção de queijo coalho empanado.'},
+  {id:26,cat:'Porções',name:'Raquete de frango',price:42.90,desc:'Porção de frango. Nome e composição devem ser confirmados.'},
+  {id:27,cat:'Parmegianas',name:'Parmegiana de filé de tilápia',price:69.90,desc:'Filé de tilápia à parmegiana, arroz e batata frita.',tags:['Refeição']},
+  {id:28,cat:'Parmegianas',name:'Parmegiana de filé-mignon',price:89.90,desc:'Filé-mignon à parmegiana, arroz e batata frita.',tags:['Refeição']},
+  {id:29,cat:'Acompanhamentos',name:'Arroz',price:6.00,desc:'Porção de arroz.'},
+  {id:30,cat:'Acompanhamentos',name:'Farofa',price:7.00,desc:'Porção de farofa.'},
+  {id:31,cat:'Acompanhamentos',name:'Mandioca',price:8.00,desc:'Porção de mandioca.'},
+  {id:32,cat:'Acompanhamentos',name:'Feijão tropeiro',price:7.00,desc:'Porção de feijão tropeiro.'},
+  {id:33,cat:'Acompanhamentos',name:'Vinagrete',price:4.90,desc:'Porção de vinagrete.'},
+  {id:34,cat:'Acompanhamentos',name:'Combo Armazém',price:14.90,desc:'Arroz, feijão tropeiro, mandioca e vinagrete.',tags:['Combo']},
+  {id:35,cat:'Lanches',name:'Armazém Clássico',price:25.90,desc:'Pão, hambúrguer 170 g, cheddar, bacon, tomate, alface e molho especial.',availability:'regularSandwich',tags:['170 g']},
+  {id:36,cat:'Lanches',name:'Armazém Super Clássico',price:34.90,desc:'Pão, 2 hambúrgueres de 170 g, cheddar, bacon, tomate, alface e molho especial.',availability:'regularSandwich',tags:['Duplo']},
+  {id:37,cat:'Lanches',name:'Armazém Chicken',price:24.90,desc:'Pão, hambúrguer de 170 g, cheddar, bacon, tomate, alface e molho especial. Tipo da carne a confirmar.',availability:'regularSandwich'},
+  {id:38,cat:'Lanches',name:'Armazém Chicken Duplo',price:32.90,desc:'Pão, 2 hambúrgueres de peito de frango, cheddar, bacon, alface, tomate e molho especial.',availability:'regularSandwich',tags:['Duplo']},
+  {id:39,cat:'Lanches',name:'Toscana Burger',price:24.90,desc:'Pão francês, hambúrguer de linguiça toscana, muçarela, bacon crocante e pimenta-biquinho.',availability:'regularSandwich'},
+  {id:40,cat:'Lanches',name:'Armazém Kids',price:34.90,desc:'X-búrguer, batata frita e brinquedo colecionável.',availability:'regularSandwich',tags:['Kids']},
+  {id:41,cat:'Lanches',name:'Churrasquinho Paulista',price:35.90,desc:'Baguete, bife de carne nobre, muçarela, bacon crocante, maionese defumada e tomate grelhado.',availability:'tuesday',tags:['Só terça']},
+  {id:42,cat:'Chopes',name:'Chope Antarctica',price:9.50,desc:'Volume a confirmar.',alcohol:true},
+  {id:43,cat:'Chopes',name:'Chope Colina',price:5.00,desc:'Tipo ou volume a confirmar.',alcohol:true},
+  {id:44,cat:'Chopes',name:'Chope de vinho',price:9.00,desc:'Descrição e volume a confirmar.',alcohol:true},
+  {id:45,cat:'Cervejas 600 ml',name:'Heineken 600 ml',price:15.90,desc:'Cerveja garrafa 600 ml.',alcohol:true},
+  {id:46,cat:'Cervejas 600 ml',name:'Stella Artois 600 ml',price:13.90,desc:'Cerveja garrafa 600 ml.',alcohol:true},
+  {id:47,cat:'Cervejas 600 ml',name:'Brahma 600 ml',price:11.90,desc:'Cerveja garrafa 600 ml.',alcohol:true},
+  {id:48,cat:'Cervejas 600 ml',name:'Skol 600 ml',price:11.90,desc:'Cerveja garrafa 600 ml.',alcohol:true},
+  {id:49,cat:'Cervejas 600 ml',name:'Original 600 ml',price:12.90,desc:'Cerveja garrafa 600 ml.',alcohol:true},
+  {id:50,cat:'Cervejas 600 ml',name:'Spaten 600 ml',price:13.90,desc:'Cerveja garrafa 600 ml.',alcohol:true},
+  {id:51,cat:'Cervejas 600 ml',name:'Amstel 600 ml',price:9.90,desc:'Cerveja garrafa 600 ml.',alcohol:true},
+  {id:52,cat:'Cervejas especiais',name:'Baden Cristal',price:19.90,desc:'Cerveja especial.',alcohol:true},
+  {id:53,cat:'Cervejas especiais',name:'Baden Witbier',price:19.90,desc:'Cerveja especial de trigo.',alcohol:true},
+  {id:54,cat:'Cervejas especiais',name:'Praya',price:19.90,desc:'Cerveja especial.',alcohol:true},
+  {id:55,cat:'Cervejas especiais',name:'Colorado Indica',price:19.90,desc:'Cerveja especial estilo IPA.',alcohol:true},
+  {id:56,cat:'Long neck',name:'Heineken',price:9.00,desc:'Cerveja long neck.',alcohol:true},
+  {id:57,cat:'Long neck',name:'Heineken Zero',price:9.00,desc:'Cerveja long neck sem álcool.',tags:['Sem álcool']},
+  {id:58,cat:'Long neck',name:'Budweiser',price:8.00,desc:'Cerveja long neck.',alcohol:true},
+  {id:59,cat:'Long neck',name:'Corona',price:9.00,desc:'Cerveja long neck.',alcohol:true},
+  {id:60,cat:'Long neck',name:'Amstel Ultra',price:9.00,desc:'Cerveja long neck.',alcohol:true},
+  {id:61,cat:'Bebidas sem álcool',name:'Suco natural de laranja',price:10.00,desc:'Suco natural de laranja.',tags:['Sem álcool']},
+  {id:62,cat:'Bebidas sem álcool',name:'Suco natural de limão',price:10.00,desc:'Suco natural de limão.',tags:['Sem álcool']},
+  {id:63,cat:'Bebidas sem álcool',name:'Suco natural de maracujá',price:10.00,desc:'Suco natural de maracujá.',tags:['Sem álcool']},
+  {id:64,cat:'Bebidas sem álcool',name:'Del Valle de uva',price:6.00,desc:'Suco em lata sabor uva.',tags:['Sem álcool']},
+  {id:65,cat:'Bebidas sem álcool',name:'Coca-Cola 600 ml normal ou zero',price:8.50,desc:'Refrigerante 600 ml.',tags:['Sem álcool']},
+  {id:66,cat:'Bebidas sem álcool',name:'H2OH! 600 ml',price:6.00,desc:'Bebida gaseificada 600 ml.',tags:['Sem álcool']},
+  {id:67,cat:'Bebidas sem álcool',name:'H2OH! Limoneto 600 ml',price:6.00,desc:'Bebida gaseificada sabor limão.',tags:['Sem álcool']},
+  {id:68,cat:'Bebidas sem álcool',name:'Coca-Cola 1 L normal ou zero',price:11.90,desc:'Refrigerante 1 litro.',tags:['Sem álcool']},
+  {id:69,cat:'Bebidas sem álcool',name:'Guaraná Antarctica 1 L',price:10.00,desc:'Refrigerante 1 litro.',tags:['Sem álcool']},
+  {id:70,cat:'Bebidas sem álcool',name:'Coca-Cola lata',price:6.50,desc:'Refrigerante em lata.',tags:['Sem álcool']},
+  {id:71,cat:'Bebidas sem álcool',name:'Coca-Cola Zero lata',price:6.50,desc:'Refrigerante zero em lata.',tags:['Sem álcool']},
+  {id:72,cat:'Bebidas sem álcool',name:'Fanta Laranja lata',price:6.50,desc:'Refrigerante em lata.',tags:['Sem álcool']},
+  {id:73,cat:'Bebidas sem álcool',name:'Fanta Uva lata',price:6.50,desc:'Refrigerante em lata.',tags:['Sem álcool']},
+  {id:74,cat:'Bebidas sem álcool',name:'Sprite lata',price:6.50,desc:'Refrigerante em lata.',tags:['Sem álcool']},
+  {id:75,cat:'Bebidas sem álcool',name:'Guaraná Antarctica lata',price:6.50,desc:'Refrigerante em lata.',tags:['Sem álcool']},
+  {id:76,cat:'Bebidas sem álcool',name:'Schweppes Tônica lata',price:6.50,desc:'Água tônica em lata.',tags:['Sem álcool']},
+  {id:77,cat:'Bebidas sem álcool',name:'Schweppes Citrus lata',price:6.50,desc:'Refrigerante cítrico em lata.',tags:['Sem álcool']},
+  {id:78,cat:'Bebidas sem álcool',name:'Monster 473 ml',price:15.00,desc:'Energético. Sabor a confirmar.',tags:['Sem álcool']},
+  {id:79,cat:'Bebidas sem álcool',name:'Red Bull',price:16.00,desc:'Energético. Volume a confirmar.',tags:['Sem álcool']},
+  {id:80,cat:'Bebidas sem álcool',name:'Água sem gás',price:3.00,desc:'Água mineral sem gás.',tags:['Sem álcool']},
+  {id:81,cat:'Bebidas sem álcool',name:'Água com gás',price:4.00,desc:'Água mineral com gás.',tags:['Sem álcool']},
+  {id:82,cat:'Bebidas sem álcool',name:'Soda italiana — frutas vermelhas',price:11.90,desc:'Drink sem álcool sabor frutas vermelhas.',tags:['Sem álcool']},
+  {id:83,cat:'Bebidas sem álcool',name:'Soda italiana — maçã verde',price:11.90,desc:'Drink sem álcool sabor maçã verde.',tags:['Sem álcool']},
+  {id:84,cat:'Drinks refrescantes',name:'Mojito',price:15.90,desc:'Rum carta branca, hortelã, limão-taiti e água com gás.',alcohol:true},
+  {id:85,cat:'Drinks refrescantes',name:'Mojito Tropical',price:16.90,desc:'Rum carta branca, hortelã, maracujá e água com gás.',alcohol:true},
+  {id:86,cat:'Drinks refrescantes',name:'Tequila Sunrise',price:17.90,desc:'Tequila, suco de laranja e xarope de grenadine.',alcohol:true},
+  {id:87,cat:'Drinks refrescantes',name:'Lagoa Azul',price:19.90,desc:'Curaçao Blue, vodca, limão e água com gás.',alcohol:true},
+  {id:88,cat:'Drinks refrescantes',name:'Tom Collins',price:24.90,desc:'Gin, xarope de açúcar, limão-siciliano e água com gás.',alcohol:true},
+  {id:89,cat:'Drinks clássicos',name:'Negroni',price:23.00,desc:'Gin London Dry, vermute e Campari.',alcohol:true},
+  {id:90,cat:'Drinks clássicos',name:'Dry Martini',price:20.00,desc:'Gin London Dry e vermute.',alcohol:true},
+  {id:91,cat:'Drinks clássicos',name:'Moscow Mule',price:24.90,desc:'Vodca, limão, xarope de gengibre e espuma de gengibre.',alcohol:true},
+  {id:92,cat:'Drinks clássicos',name:'Cuba Libre',price:18.00,desc:'Rum Havana Club, Coca-Cola e limão.',alcohol:true},
+  {id:93,cat:'Drinks clássicos',name:"Jack N' Coke",price:18.00,desc:"Jack Daniel's e Coca-Cola.",alcohol:true},
+  {id:94,cat:'Drinks clássicos',name:'Gin Tônica Tanqueray',price:28.50,desc:'Gin Tanqueray, limão e especiarias.',alcohol:true},
+  {id:95,cat:'Drinks clássicos',name:'Cosmopolitan',price:20.00,desc:'Vodca, suco de cranberry, licor de laranja e limão.',alcohol:true},
+  {id:96,cat:'Drinks clássicos',name:'Boulevardier',price:24.90,desc:'Whisky bourbon, vermute e Campari.',alcohol:true},
+  {id:97,cat:'Drinks brasileiros',name:'Caipirinha',price:14.50,desc:'Sabores: limão, morango ou maracujá.',alcohol:true,tags:['Escolha o sabor']},
+  {id:98,cat:'Drinks brasileiros',name:'Jorge Amado',price:15.90,desc:'Cachaça, cachaça cravo e canela, limão e maracujá.',alcohol:true},
+  {id:99,cat:'Doses',name:'Cachaça Seleta',price:6.00,desc:'Dose de cachaça.',alcohol:true},
+  {id:100,cat:'Doses',name:'Cachaça Gabriela',price:8.90,desc:'Dose de cachaça.',alcohol:true},
+  {id:101,cat:'Doses',name:'Cachaça Salinas (Umburana)',price:9.00,desc:'Dose de cachaça envelhecida em umburana.',alcohol:true},
+  {id:102,cat:'Doses',name:'Cachaça Boazinha',price:6.00,desc:'Dose de cachaça.',alcohol:true},
+  {id:103,cat:'Doses',name:'Velho Barreiro',price:4.00,desc:'Dose de cachaça.',alcohol:true},
+  {id:104,cat:'Doses',name:'Black Label',price:19.90,desc:'Dose de whisky.',alcohol:true},
+  {id:105,cat:'Doses',name:"Jack Daniel's",price:19.90,desc:'Dose de whisky.',alcohol:true},
+  {id:106,cat:'Doses',name:'Red Label',price:19.90,desc:'Dose de whisky.',alcohol:true},
+  {id:107,cat:'Doses',name:'Tequila Jose Cuervo',price:14.00,desc:'Dose de tequila.',alcohol:true},
+  {id:108,cat:'Doses',name:'CDB',price:4.00,desc:'Limão, sal e gelo. Significado do nome a confirmar.',alcohol:true},
+  {id:109,cat:'Doses',name:'Taça de vinho seco ou suave',price:8.90,desc:'Taça de vinho. Escolha seco ou suave.',alcohol:true},
+  {id:110,cat:'Licores',name:'Licor Capuccino',price:9.90,desc:'Dose de licor sabor capuccino.',alcohol:true},
+  {id:111,cat:'Licores',name:'Licor de morango',price:8.90,desc:'Dose de licor sabor morango.',alcohol:true},
+  {id:112,cat:'Licores',name:'Licor 43',price:19.90,desc:'Dose de Licor 43.',alcohol:true},
+  {id:113,cat:'Licores',name:'Licor 43 Chocolate',price:19.90,desc:'Dose de Licor 43 Chocolate.',alcohol:true},
+  {id:114,cat:'Licores',name:'Amarula',price:9.90,desc:'Dose de licor Amarula.',alcohol:true},
+  {id:115,cat:'Shots',name:'Bombeirinho',price:5.00,desc:'Limão, cachaça e groselha.',alcohol:true,tags:['3º + 4º grátis?']}
+];
+
+const categoryOrder = ['Todos','Espetos','Porções','Parmegianas','Acompanhamentos','Lanches','Chopes','Cervejas 600 ml','Cervejas especiais','Long neck','Bebidas sem álcool','Drinks refrescantes','Drinks clássicos','Drinks brasileiros','Doses','Licores','Shots'];
+let currentCategory = 'Todos';
+let searchTerm = '';
+let cart = JSON.parse(localStorage.getItem('armazem-cart') || '{}');
+let chatStarted = false;
+
+const money = value => value.toLocaleString('pt-BR', {style:'currency', currency:'BRL'});
+const normalize = value => value.normalize('NFD').replace(/[\u0300-\u036f]/g,'').toLowerCase();
+
+function availabilityInfo(product) {
+  const day = new Date().getDay();
+  if (product.availability === 'tuesday') return {ok: day === 2, label:'Somente às terças'};
+  if (product.availability === 'regularSandwich') return {ok:[1,3,4,5,6].includes(day), label:'Segunda a sábado, exceto terça'};
+  return {ok:true, label:''};
+}
+
+function renderCategories() {
+  document.getElementById('categoryNav').innerHTML = categoryOrder.map(cat => `<button class="chip ${cat===currentCategory?'active':''}" onclick="selectCategory(${JSON.stringify(cat)})">${cat}</button>`).join('');
+}
+
+function selectCategory(category) {
+  currentCategory = category;
+  renderCategories();
+  renderMenu();
+  window.scrollTo({top: document.querySelector('.search-wrap').offsetTop, behavior:'smooth'});
+}
+
+function filteredProducts() {
+  return products.filter(p => {
+    const categoryMatch = currentCategory === 'Todos' || p.cat === currentCategory;
+    const haystack = normalize(`${p.name} ${p.desc} ${p.cat} ${(p.tags||[]).join(' ')}`);
+    return categoryMatch && (!searchTerm || haystack.includes(searchTerm));
+  });
+}
+
+function productCard(p) {
+  const availability = availabilityInfo(p);
+  const badges = [];
+  if (p.tags) badges.push(...p.tags.map(tag => `<span class="badge">${tag}</span>`));
+  if (p.alcohol) badges.push('<span class="badge gray">18+</span>');
+  if (availability.label) badges.push(`<span class="badge ${availability.ok?'green':'gray'}">${availability.ok?'Disponível hoje':'Indisponível hoje'} · ${availability.label}</span>`);
+  return `<article class="card ${availability.ok?'':'unavailable'}"><div><h4 class="card-name">${p.name}</h4><p class="card-desc">${p.desc}</p>${badges.length?`<div class="badges">${badges.join('')}</div>`:''}</div><div class="card-side"><span class="price">${money(p.price)}</span><button class="add-btn" ${availability.ok?'':'disabled'} onclick="addToCart(${p.id})" aria-label="Adicionar ${p.name}">+</button></div></article>`;
+}
+
+function renderMenu() {
+  const data = filteredProducts();
+  const root = document.getElementById('menuRoot');
+  if (!data.length) { root.innerHTML = '<div class="empty">Nenhum item encontrado. Tente outro nome ou categoria.</div>'; return; }
+  const groups = currentCategory === 'Todos' ? categoryOrder.slice(1) : [currentCategory];
+  root.innerHTML = groups.map(cat => {
+    const items = data.filter(p => p.cat === cat);
+    return items.length ? `<section><div class="section-head"><h3>${cat}</h3><span>${items.length} ${items.length===1?'item':'itens'}</span></div><div class="grid">${items.map(productCard).join('')}</div></section>` : '';
+  }).join('');
+}
+
+function persistCart() { localStorage.setItem('armazem-cart', JSON.stringify(cart)); updateCartBar(); }
+function addToCart(id) { cart[id] = (cart[id] || 0) + 1; persistCart(); if (window.Android && Android.showToast) Android.showToast('Item adicionado'); }
+function changeQty(id, amount) { cart[id] = (cart[id] || 0) + amount; if (cart[id] <= 0) delete cart[id]; persistCart(); renderCart(); }
+function cartEntries() { return Object.entries(cart).map(([id, qty]) => ({product: products.find(p => p.id === Number(id)), qty})).filter(x => x.product); }
+function cartTotals() { const entries = cartEntries(); return {count:entries.reduce((s,x)=>s+x.qty,0), total:entries.reduce((s,x)=>s+x.product.price*x.qty,0)}; }
+function updateCartBar() { const t=cartTotals(); document.getElementById('cartCount').textContent=t.count?`${t.count} ${t.count===1?'item':'itens'}`:'Pedido vazio'; document.getElementById('cartTotal').textContent=money(t.total); }
+
+function renderCart() {
+  const entries=cartEntries(), list=document.getElementById('cartList');
+  list.innerHTML = entries.length ? entries.map(({product,qty}) => `<div class="cart-item"><div><strong>${product.name}</strong><small>${money(product.price)} cada · ${money(product.price*qty)}</small></div><div class="qty"><button onclick="changeQty(${product.id},-1)">−</button><strong>${qty}</strong><button onclick="changeQty(${product.id},1)">+</button></div></div>`).join('') : '<div class="empty">Seu pedido ainda está vazio.</div>';
+  document.getElementById('sheetTotal').textContent=money(cartTotals().total);
+}
+
+function openCart(){renderCart();document.getElementById('cartOverlay').classList.add('open');}
+function openChat(){document.getElementById('chatOverlay').classList.add('open');if(!chatStarted){addBubble('bot','Olá! Sou o atendente automático deste protótipo. Posso localizar produtos, preços, opções sem álcool, lanches de hoje e a promoção de shots.');chatStarted=true;}setTimeout(()=>document.getElementById('chatInput').focus(),180);}
+function showInfo(){document.getElementById('infoOverlay').classList.add('open');}
+function closeOverlay(id){document.getElementById(id).classList.remove('open');}
+function overlayClose(event,id){if(event.target.id===id)closeOverlay(id);}
+
+function orderText(){
+  const entries=cartEntries(); if(!entries.length)return '';
+  const table=document.getElementById('tableNumber').value.trim(), notes=document.getElementById('orderNotes').value.trim();
+  const lines=['🍽️ *PEDIDO — ARMAZÉM*',table?`📍 ${table}`:'📍 Mesa não informada',''];
+  entries.forEach(({product,qty})=>lines.push(`${qty}x ${product.name} — ${money(product.price*qty)}`));
+  lines.push('',`💰 *Total estimado: ${money(cartTotals().total)}*`); if(notes)lines.push(`📝 Observações: ${notes}`); lines.push('','Aguardando confirmação de disponibilidade e valor pela equipe.'); return lines.join('\n');
+}
+
+function copyOrder(){const text=orderText();if(!text)return notify('Adicione pelo menos um item.');if(window.Android&&Android.copyText)Android.copyText(text);else navigator.clipboard?.writeText(text).then(()=>notify('Pedido copiado.'));}
+function shareOrder(){const text=orderText();if(!text)return notify('Adicione pelo menos um item.');if(window.Android&&Android.shareText)Android.shareText('Pedido Armazém',text);else if(navigator.share)navigator.share({title:'Pedido Armazém',text});else copyOrder();}
+function notify(message){if(window.Android&&Android.showToast)Android.showToast(message);else alert(message);}
+
+function addBubble(type,text){const box=document.getElementById('chatBox'),bubble=document.createElement('div');bubble.className=`bubble ${type}`;bubble.textContent=text;box.appendChild(bubble);box.scrollTop=box.scrollHeight;}
+function askQuick(text){document.getElementById('chatInput').value=text;sendChat(new Event('submit'));}
+function sendChat(event){event.preventDefault();const input=document.getElementById('chatInput'),text=input.value.trim();if(!text)return;addBubble('user',text);input.value='';setTimeout(()=>addBubble('bot',botAnswer(text)),220);}
+
+function botAnswer(question){
+  const q=normalize(question);
+  if(q.includes('sem alcool')||q.includes('nao alcool')||q.includes('refrigerante')||q.includes('suco')){const list=products.filter(p=>p.cat==='Bebidas sem álcool').slice(0,8);return 'Temos várias opções sem álcool, como:\n'+list.map(p=>`• ${p.name} — ${money(p.price)}`).join('\n')+'\n\nUse a categoria “Bebidas sem álcool” para ver todas.';}
+  if(q.includes('porcao'))return 'Porções disponíveis no cardápio:\n'+products.filter(p=>p.cat==='Porções').map(p=>`• ${p.name} — ${money(p.price)}`).join('\n');
+  if(q.includes('lanche')||q.includes('hamburg')){const list=products.filter(p=>p.cat==='Lanches');return 'Lanches e disponibilidade de hoje:\n'+list.map(p=>`• ${p.name} — ${money(p.price)} (${availabilityInfo(p).ok?'disponível':'indisponível hoje'})`).join('\n');}
+  if(q.includes('promoc')||q.includes('shot')||q.includes('bombeir'))return 'O cardápio informa: “No terceiro shot, o quarto sai de graça”. A regra exata precisa ser confirmada com a equipe antes do pedido.';
+  if(q.includes('barato')||q.includes('menor preco')){const cheapest=[...products].sort((a,b)=>a.price-b.price).slice(0,6);return 'Algumas opções de menor preço:\n'+cheapest.map(p=>`• ${p.name} — ${money(p.price)}`).join('\n');}
+  if(q.includes('terça')||q.includes('terca'))return 'Às terças, o lanche especial informado é o Churrasquinho Paulista por R$ 35,90. Os demais lanches estão marcados como disponíveis de segunda a sábado, exceto terça.';
+  const words=q.split(/\s+/).filter(w=>w.length>2&&!['qual','quais','tem','quanto','custa','preco','valor'].includes(w));
+  const matches=products.filter(p=>words.some(w=>normalize(`${p.name} ${p.desc} ${p.cat}`).includes(w))).slice(0,6);
+  if(matches.length)return 'Encontrei estas opções:\n'+matches.map(p=>`• ${p.name} — ${money(p.price)}\n  ${p.desc}`).join('\n');
+  return 'Não encontrei uma resposta exata. Tente informar o nome do produto, a categoria ou perguntar por “porções”, “bebidas sem álcool”, “lanches hoje” ou “promoção de shots”.';
+}
+
+window.handleAndroidBack=function(){const open=[...document.querySelectorAll('.overlay.open')];if(open.length){open[open.length-1].classList.remove('open');return true;}if(currentCategory!=='Todos'||searchTerm){currentCategory='Todos';searchTerm='';document.getElementById('searchInput').value='';renderCategories();renderMenu();return true;}return false;};
+
+document.getElementById('searchInput').addEventListener('input',event=>{searchTerm=normalize(event.target.value.trim());renderMenu();});
+document.getElementById('tableNumber').value=localStorage.getItem('armazem-table')||'';
+document.getElementById('tableNumber').addEventListener('input',e=>localStorage.setItem('armazem-table',e.target.value));
+renderCategories();renderMenu();updateCartBar();
+</script>
+</body>
+</html>
