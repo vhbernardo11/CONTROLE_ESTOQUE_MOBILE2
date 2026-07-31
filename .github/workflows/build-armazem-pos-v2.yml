@@ -1,0 +1,37 @@
+name: Build Armazem POS Mobile v2
+on:
+  workflow_dispatch:
+  pull_request:
+    branches: [ main ]
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '21'
+          cache: maven
+      - name: Decode project
+        run: |
+          cat armazem-pos-v2/part-* > project.b64
+          base64 -d project.b64 > project.zip
+          unzip -q project.zip
+      - name: Test and package
+        working-directory: armazem-pos-mobile-v2
+        run: mvn -B clean verify
+      - name: Build distribution
+        run: |
+          mkdir -p dist/source
+          cp armazem-pos-mobile-v2/target/armazem-pos-mobile.jar dist/
+          cp armazem-pos-mobile-v2/README.md armazem-pos-mobile-v2/.env.example armazem-pos-mobile-v2/iniciar-windows.bat armazem-pos-mobile-v2/iniciar-linux.sh armazem-pos-mobile-v2/docker-compose.yml dist/
+          cp project.zip dist/source/armazem-pos-mobile-v2-source.zip
+          chmod +x dist/iniciar-linux.sh
+      - uses: actions/upload-artifact@v4
+        with:
+          name: armazem-pos-mobile-v2
+          path: dist
+          retention-days: 14
